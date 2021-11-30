@@ -1,0 +1,22 @@
+services:
+    ajax_controller_resolver:
+        public: true
+        class: Melodyx\Ajax\ControllerResolver
+
+    ajax_kernel:
+        public: true
+        class: Melodyx\Ajax\AjaxKernel
+        autowire: true
+
+        arguments:
+            $resolver: '@ajax_controller_resolver'
+
+    Melodyx\Ajax\Piece\PieceEventListener:
+        tags:
+            - { name: kernel.event_listener, event: piece.render }
+        autowire: true
+
+    ajax_twig_extension:
+        class: Melodyx\Ajax\Twig\AjaxExtension
+        tags:
+            - { name: twig.extension }

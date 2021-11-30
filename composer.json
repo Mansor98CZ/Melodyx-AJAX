@@ -1,0 +1,21 @@
+{
+  "name": "melodyx/ajax",
+  "version": "0.0.1",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Marek Mansor Fojtl"
+    }
+  ],
+  "require": {
+    "php": ">=8.0",
+    "ext-json": "*",
+    "symfony/framework-bundle": "5.3.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Melodyx\\Ajax\\": "src/"
+    }
+  }
+}
