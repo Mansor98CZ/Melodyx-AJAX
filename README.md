@@ -1,5 +1,12 @@
 # Melodyx-AJAX
 
+### Install via composer
+[Packagist](https://packagist.org/packages/melodyx/ajax)
+``` shell
+composer require melodyx/ajax
+```
+
+
 ### How to setup
 `bundles.php`
 ```php
