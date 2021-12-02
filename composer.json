@@ -3,6 +3,10 @@
   "version": "0.0.2",
   "type": "library",
   "license": "MIT",
+  "keywords": [
+    "symfony",
+    "ajax"
+  ],
   "authors": [
     {
       "name": "Marek Mansor Fojtl"
