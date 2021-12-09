@@ -21,11 +21,9 @@ $.melodyx.ajax = function (options, callback) {
             }
             if ('pieces' in data) {
                 let pieces = data.pieces;
-                console.log(pieces);
                 $.each(pieces, function (key, value) {
                     console.log(key);
                     let element = $('#piece-' + key);
-                    console.log(element);
                     element.html(value);
                 });
             }
