@@ -1,4 +1,8 @@
 services:
+    error_handler.error_renderer.html:
+        class: Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer
+        public: true
+        autowire: true
     ajax_controller_resolver:
         public: true
         class: Melodyx\Ajax\ControllerResolver
@@ -10,13 +14,24 @@ services:
 
         arguments:
             $resolver: '@ajax_controller_resolver'
+            $htmlErrorRenderer: '@error_handler.error_renderer.html'
 
     Melodyx\Ajax\Piece\PieceEventListener:
         tags:
             - { name: kernel.event_listener, event: piece.render }
         autowire: true
 
+    ajax_js_component:
+        class: Melodyx\Ajax\AjaxJsComponent
+        autowire: true
+        public: true
+
     ajax_twig_extension:
         class: Melodyx\Ajax\Twig\AjaxExtension
+        autowire: true
+        arguments:
+            - '@ajax_js_component'
         tags:
             - { name: twig.extension }
+
+
