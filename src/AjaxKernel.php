@@ -198,6 +198,9 @@ class AjaxKernel implements HttpKernelInterface, TerminableInterface
      */
     private function handleThrowable(\Throwable $e, Request $request, int $type): Response
     {
+        $response = new Response();
+        $response->setContent($e->getMessage());
+        return $response;
         $event = new ExceptionEvent($this, $request, $type, $e);
         $this->dispatcher->dispatch($event, KernelEvents::EXCEPTION);
 
