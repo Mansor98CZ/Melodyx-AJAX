@@ -9,13 +9,17 @@ use Melodyx\Ajax\Exception\PrerenderAttributeNotDefined;
 use Melodyx\Ajax\Piece\PieceEvent;
 use Melodyx\Ajax\Twig\PieceIdentifierCollector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
+use Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -32,6 +36,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Twig\Environment;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\ref;
 
 // Help opcache.preload discover always-needed symbols
@@ -53,7 +58,11 @@ class AjaxKernel implements HttpKernelInterface, TerminableInterface
     protected $requestStack;
     private $argumentResolver;
 
-    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null, ArgumentResolverInterface $argumentResolver = null, private ContainerInterface $container)
+    public function __construct(
+        EventDispatcherInterface $dispatcher,
+        ControllerResolverInterface $resolver, RequestStack $requestStack = null, ArgumentResolverInterface $argumentResolver = null, private ContainerInterface $container,
+        private HtmlErrorRenderer $htmlErrorRenderer,
+    )
     {
         $this->dispatcher = $dispatcher;
         $this->resolver = $resolver;
@@ -198,6 +207,12 @@ class AjaxKernel implements HttpKernelInterface, TerminableInterface
      */
     private function handleThrowable(\Throwable $e, Request $request, int $type): Response
     {
+        $this->htmlErrorRenderer = new HtmlErrorRenderer(true);
+        $html = $this->htmlErrorRenderer->getBody(FlattenException::createFromThrowable($e));
+        $errorData = [
+            'pieces-error' => $html
+        ];
+        return new JsonResponse($errorData);
         $event = new ExceptionEvent($this, $request, $type, $e);
         $this->dispatcher->dispatch($event, KernelEvents::EXCEPTION);
 
